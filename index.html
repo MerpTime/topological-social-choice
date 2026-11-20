@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Topological Social Choice Theory</title>
+  <meta name="description" content="Visual, interactive explorations of Chichilnisky's impossibility theorem and the topology of social choice.">
+  <!-- KaTeX stylesheet: provides the Computer Modern style fonts used site-wide (and math rendering later). -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app">
+
+    <main class="stage" id="stage">
+
+      <!-- ============ 00 · TITLE ============ -->
+      <section class="page page--title" id="title" data-tab="Title">
+        <canvas id="title-canvas" aria-hidden="true"></canvas>
+        <div class="title-block">
+          <h1 class="title" id="main-title">Topological Social Choice Theory</h1>
+          <p class="subtitle">Chichilnisky&rsquo;s impossibility theorem and the shape of collective choice</p>
+        </div>
+        <div class="begin-wrap">
+          <button class="begin" type="button" data-goto="next">Begin <span aria-hidden="true">&rarr;</span></button>
+          <p class="begin-hint">or press <kbd>&rarr;</kbd></p>
+        </div>
+      </section>
+
+      <!--
+        Each <section class="page"> becomes a tab in the menu, in order.
+        - id        → the URL (#/intro)
+        - data-tab  → the label shown in the menu
+      -->
+
+      <!-- ============ 01 ============ -->
+      <section class="page" id="intro" data-tab="Introduction">
+        <div class="page__inner">
+          <header class="page__head">
+            <span class="page__num"></span>
+            <h2>Introduction</h2>
+          </header>
+          <div class="placeholder">Content for this section goes here.</div>
+        </div>
+      </section>
+
+      <!-- ============ 02 ============ -->
+      <section class="page" id="circle" data-tab="Preferences on a Circle">
+        <div class="page__inner">
+          <header class="page__head">
+            <span class="page__num"></span>
+            <h2>Preferences on a Circle</h2>
+          </header>
+          <div class="placeholder">Content for this section goes here.</div>
+        </div>
+      </section>
+
+      <!-- ============ 03 ============ -->
+      <section class="page" id="theorem" data-tab="Chichilnisky&rsquo;s Theorem">
+        <div class="page__inner">
+          <header class="page__head">
+            <span class="page__num"></span>
+            <h2>Chichilnisky&rsquo;s Theorem</h2>
+          </header>
+          <div class="placeholder">Content for this section goes here.</div>
+        </div>
+      </section>
+
+      <!-- ============ 04 ============ -->
+      <section class="page" id="proof" data-tab="The Proof">
+        <div class="page__inner">
+          <header class="page__head">
+            <span class="page__num"></span>
+            <h2>The Proof</h2>
+          </header>
+          <div class="placeholder">Content for this section goes here.</div>
+        </div>
+      </section>
+
+      <!-- ============ 05 ============ -->
+      <section class="page" id="beyond" data-tab="Beyond the Circle">
+        <div class="page__inner">
+          <header class="page__head">
+            <span class="page__num"></span>
+            <h2>Beyond the Circle</h2>
+          </header>
+          <div class="placeholder">Content for this section goes here.</div>
+        </div>
+      </section>
+
+      <!-- ============ 06 ============ -->
+      <section class="page" id="vote" data-tab="Vote">
+        <div class="page__inner">
+          <header class="page__head">
+            <span class="page__num"></span>
+            <h2>Vote</h2>
+          </header>
+          <div class="placeholder">The Google Form and live results will go here.</div>
+        </div>
+      </section>
+
+    </main>
+
+    <button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" aria-label="Open sections menu">
+      <span></span><span></span><span></span>
+    </button>
+
+    <nav class="menu" id="menu" aria-label="Sections">
+      <a class="menu__head" href="#/title">
+        <svg class="menu__mark" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="9" />
+          <circle class="dot" cx="18.36" cy="5.64" r="2.4" />
+        </svg>
+        <span>Topological<br>Social Choice</span>
+      </a>
+      <ol class="menu__list" id="menu-list"></ol>
+      <p class="menu__foot"><kbd>&larr;</kbd> <kbd>&rarr;</kbd> to move between sections</p>
+    </nav>
+
+  </div>
+
+  <script src="js/title-scene.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
