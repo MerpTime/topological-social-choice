@@ -80,8 +80,15 @@
   document.addEventListener("keydown", (e) => {
     if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
     if (e.target.closest("input, textarea, select, [contenteditable]")) return;
-    if (e.key === "ArrowRight" || e.key === "PageDown") { e.preventDefault(); go(current + 1); }
-    else if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); go(current - 1); }
+    // Sections with sub-steps get first say over the arrow keys
+    const stepper = (window.pageSteppers || {})[pages[current].id];
+    if (e.key === "ArrowRight" || e.key === "PageDown") {
+      e.preventDefault();
+      if (!(stepper && stepper.next())) go(current + 1);
+    } else if (e.key === "ArrowLeft" || e.key === "PageUp") {
+      e.preventDefault();
+      if (!(stepper && stepper.prev())) go(current - 1);
+    }
     else if (e.key === "Escape") setMenu(false);
   });
 

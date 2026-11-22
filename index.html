@@ -8,6 +8,10 @@
   <!-- KaTeX stylesheet: provides the Computer Modern style fonts used site-wide (and math rendering later). -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
   <link rel="stylesheet" href="css/style.css">
+  <!-- KaTeX: renders \( ... \) and \[ ... \] math anywhere on the page -->
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, { delimiters: [ { left: '\\[', right: '\\]', display: true }, { left: '\\(', right: '\\)', display: false } ] })"></script>
 </head>
 <body>
   <div class="app">
@@ -32,72 +36,144 @@
         - data-tab  → the label shown in the menu
       -->
 
-      <!-- ============ 01 ============ -->
-      <section class="page" id="intro" data-tab="Introduction">
-        <div class="page__inner">
+      <!-- ============ 01 · HOW TO REPRESENT A VOTE ============ -->
+      <section class="page" id="represent" data-tab="How to Represent a Vote">
+        <div class="page__inner page__inner--wide">
           <header class="page__head">
             <span class="page__num"></span>
-            <h2>Introduction</h2>
+            <h2>How to Represent a Vote</h2>
           </header>
-          <div class="placeholder">Content for this section goes here.</div>
+
+          <div class="stepper" id="rep">
+            <div class="stepper__tabs" role="tablist" aria-label="Steps">
+              <button type="button" role="tab" data-step-tab><span>1</span>One issue</button>
+              <button type="button" role="tab" data-step-tab><span>2</span>Two issues</button>
+              <button type="button" role="tab" data-step-tab><span>3</span>Personal utility</button>
+              <button type="button" role="tab" data-step-tab><span>4</span>Gradient &rarr; S&sup1;</button>
+            </div>
+
+            <div class="figure">
+              <canvas class="figure__canvas" id="rep-canvas" aria-label="Diagram of spending axes and a utility surface"></canvas>
+              <p class="figure__hint" data-hint-steps="2">Right-click and drag to rotate</p>
+              <p class="figure__hint" data-hint-steps="3">Click or drag on the surface to choose a budget &middot; right-drag to rotate</p>
+            </div>
+
+            <div class="stepper__captions">
+              <p data-step-caption>A single issue: how much should be spent on the military?</p>
+              <p data-step-caption>Add a second issue, research spending. Every possible budget is now a point in the plane.</p>
+              <p data-step-caption>A third axis gives one voter&rsquo;s personal utility: how happy each budget would make them.</p>
+              <p data-step-caption>At any budget, the gradient points in the direction this voter would most like the budget to move. Its direction alone is a point on the circle S&sup1;.</p>
+            </div>
+
+            <div class="s1-panel" id="rep-s1" hidden>
+              <canvas class="s1-panel__canvas" id="rep-s1-canvas" aria-label="The gradient direction as a point on a circle"></canvas>
+              <div class="s1-panel__readout">
+                <p class="s1-panel__label">Direction of the gradient</p>
+                <p class="s1-panel__value" id="rep-theta">&theta; = 0&deg;</p>
+                <p class="s1-panel__desc" id="rep-desc"></p>
+              </div>
+            </div>
+
+            <div class="stepper__controls">
+              <button type="button" class="stepper__btn" data-step-dir="-1">&larr; Back</button>
+              <span class="stepper__count" aria-live="polite"></span>
+              <button type="button" class="stepper__btn" data-step-dir="1">Next &rarr;</button>
+            </div>
+          </div>
         </div>
       </section>
 
-      <!-- ============ 02 ============ -->
-      <section class="page" id="circle" data-tab="Preferences on a Circle">
-        <div class="page__inner">
+      <!-- ============ 02 · AVERAGING ANGLES ============ -->
+      <section class="page" id="averaging" data-tab="Averaging Angles">
+        <div class="page__inner page__inner--wide">
           <header class="page__head">
             <span class="page__num"></span>
-            <h2>Preferences on a Circle</h2>
+            <h2>Averaging Angles</h2>
           </header>
-          <div class="placeholder">Content for this section goes here.</div>
+
+          <div class="prose">
+            <p>Each voter&rsquo;s preference is now a point on the circle \(S^1\). A <em>social choice rule</em> takes everyone&rsquo;s points and returns a single point for the group. With two voters, that is a function \(\varphi : S^1 \times S^1 \to S^1\). There are three properties that are essential for a fair voting system:</p>
+          </div>
+
+          <div class="axioms">
+            <div class="axiom">
+              <h3>Unanimity</h3>
+              <p>If everyone agrees, the group chooses what they agree on.</p>
+              <p class="axiom__math">\(\varphi(x, x) = x\)</p>
+            </div>
+            <div class="axiom">
+              <h3>Anonymity</h3>
+              <p>It doesn&rsquo;t matter who cast which vote.</p>
+              <p class="axiom__math">\(\varphi(x, y) = \varphi(y, x)\)</p>
+            </div>
+            <div class="axiom">
+              <h3>Continuity</h3>
+              <p>A small change in anyone&rsquo;s vote causes only a small change in the outcome.</p>
+              <p class="axiom__math">\(\varphi\) is continuous</p>
+            </div>
+          </div>
+
+          <div class="prose">
+            <p>An intuitive voting system is to average the two angles:</p>
+          </div>
+
+          <div class="avg-demo" id="avg">
+            <div class="avg-demo__panels">
+              <div class="figure">
+                <canvas class="figure__canvas figure__canvas--square" id="avg-circle" aria-label="Two voters on a circle and their average"></canvas>
+                <p class="figure__hint is-active">Drag voter 1 or voter 2</p>
+              </div>
+              <div class="figure">
+                <canvas class="figure__canvas figure__canvas--square" id="avg-graph" aria-label="Graph of the average against the angle between the voters"></canvas>
+                <p class="figure__hint is-active">Drag along the graph to move voter 2</p>
+              </div>
+            </div>
+            <div class="avg-demo__bar">
+              <p class="avg-demo__status" id="avg-status" aria-live="polite"></p>
+              <div class="avg-demo__buttons">
+                <button type="button" class="stepper__btn" id="avg-sweep">Sweep voter 2 around</button>
+                <button type="button" class="stepper__btn" id="avg-reset">Reset</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="prose prose--after-demo">
+            <p>This, however, breaks continuity.</p>
+          </div>
+
+          <div class="prose">
+            <h3>Any two are easy</h3>
+            <p>We can easily come up with systems that follow 2 of the properties, but what about all three?</p>
+          </div>
+
+          <div class="rules" role="table" aria-label="Example rules and which properties they satisfy">
+            <div class="rules__row rules__row--head" role="row">
+              <span role="columnheader">Rule</span>
+              <span role="columnheader" aria-label="Unanimity"><span class="long">Unanimity</span><span class="short" aria-hidden="true">U</span></span>
+              <span role="columnheader" aria-label="Anonymity"><span class="long">Anonymity</span><span class="short" aria-hidden="true">A</span></span>
+              <span role="columnheader" aria-label="Continuity"><span class="long">Continuity</span><span class="short" aria-hidden="true">C</span></span>
+            </div>
+            <div class="rules__row" role="row">
+              <span role="cell"><strong>Dictatorship</strong> &mdash; voter 1 decides. \(\varphi(x, y) = x\)</span>
+              <span role="cell" class="yes" aria-label="yes">&#10003;</span>
+              <span role="cell" class="no" aria-label="no">&#10007;</span>
+              <span role="cell" class="yes" aria-label="yes">&#10003;</span>
+            </div>
+            <div class="rules__row" role="row">
+              <span role="cell"><strong>Constant</strong> &mdash; always choose north, whatever anyone says.</span>
+              <span role="cell" class="no" aria-label="no">&#10007;</span>
+              <span role="cell" class="yes" aria-label="yes">&#10003;</span>
+              <span role="cell" class="yes" aria-label="yes">&#10003;</span>
+            </div>
+            <div class="rules__row" role="row">
+              <span role="cell"><strong>Averaging</strong> &mdash; take the midpoint of the shorter arc between the votes. If they are exactly opposite, take whichever midpoint is nearer north.</span>
+              <span role="cell" class="yes" aria-label="yes">&#10003;</span>
+              <span role="cell" class="yes" aria-label="yes">&#10003;</span>
+              <span role="cell" class="no" aria-label="no">&#10007;</span>
+            </div>
+          </div>
         </div>
       </section>
-
-      <!-- ============ 03 ============ -->
-      <section class="page" id="theorem" data-tab="Chichilnisky&rsquo;s Theorem">
-        <div class="page__inner">
-          <header class="page__head">
-            <span class="page__num"></span>
-            <h2>Chichilnisky&rsquo;s Theorem</h2>
-          </header>
-          <div class="placeholder">Content for this section goes here.</div>
-        </div>
-      </section>
-
-      <!-- ============ 04 ============ -->
-      <section class="page" id="proof" data-tab="The Proof">
-        <div class="page__inner">
-          <header class="page__head">
-            <span class="page__num"></span>
-            <h2>The Proof</h2>
-          </header>
-          <div class="placeholder">Content for this section goes here.</div>
-        </div>
-      </section>
-
-      <!-- ============ 05 ============ -->
-      <section class="page" id="beyond" data-tab="Beyond the Circle">
-        <div class="page__inner">
-          <header class="page__head">
-            <span class="page__num"></span>
-            <h2>Beyond the Circle</h2>
-          </header>
-          <div class="placeholder">Content for this section goes here.</div>
-        </div>
-      </section>
-
-      <!-- ============ 06 ============ -->
-      <section class="page" id="vote" data-tab="Vote">
-        <div class="page__inner">
-          <header class="page__head">
-            <span class="page__num"></span>
-            <h2>Vote</h2>
-          </header>
-          <div class="placeholder">The Google Form and live results will go here.</div>
-        </div>
-      </section>
-
     </main>
 
     <button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" aria-label="Open sections menu">
@@ -120,6 +196,9 @@
 
   <script src="js/torus.js"></script>
   <script src="js/title-scene.js"></script>
+  <script src="js/stepper.js"></script>
+  <script src="js/represent-vote.js"></script>
+  <script src="js/averaging.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>
