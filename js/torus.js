@@ -37,6 +37,10 @@
       intro: true,            // build-in animation
       startDelay: 0,          // seconds before the intro begins
       orbit: true,            // right-click + drag to rotate the view
+      guides: [],             // circles drawn on the surface: { along: "u" | "v", at, color }
+      onFrame: null,          // called each frame with the loop parameter s in [0, 1)
+      drawLoop: true,         // draw the built-in (p, q) loop and its moving point
+      extras: null,           // extras(api): add curves/points each frame (see below)
       frame: null,
     }, options || {});
 
@@ -77,6 +81,8 @@
     let W = 0, H = 0, cx = 0, cy = 0, scale = 100, fitW = 100, fitH = Infinity;
     let phi = 0, cosA = 1, sinA = 0, cosP = 1, sinP = 0;
     let tilt = o.tilt, spinOffset = 0;   // changed by right-drag orbiting
+    let loopT0 = o.startDelay + 2.0;     // time at which the traced point left the start
+    let lastT = 0;
     const D = 7; // camera distance (model units)
 
     function resize() {
@@ -114,11 +120,14 @@
       ctx.globalAlpha = 1;
     }
 
+    const surfAt = (uv) => surf(uv[0], uv[1], r * 1.05);
+
     function loopPoint(s) { // s in [0,1)
       return surf(TAU * o.p * s, TAU * o.q * s, r * 1.05);
     }
 
     function draw(t) {
+      lastT = t;
       ctx.clearRect(0, 0, W, H);
       const ti = t - o.startDelay;
       const build = o.intro ? smooth(prog(ti, 0, 2.2)) : 1;
@@ -149,9 +158,46 @@
         }
       }
 
+      // Guide circles on the surface (e.g. the two directions around the torus)
+      for (const g of o.guides) {
+        const N = 120, at = (k) => {
+          const a = (k / N) * TAU;
+          return view(g.along === "u" ? surf(a, g.at, r * 1.03) : surf(g.at, a, r * 1.03));
+        };
+        let prev = at(0);
+        for (let k = 1; k <= N; k++) {
+          const cur = at(k);
+          items.push({ kind: 1, depth: (prev[2] + cur[2]) / 2 + 0.08, p0: prev, p1: cur, alpha: 0.75 * build, w: 2, color: g.color });
+          prev = cur;
+        }
+      }
+
+      // Extra curves and points supplied by the page:
+      //   api.curve(fn, { color, alpha, w, n })  fn(s) -> [u, v] for s in [0, 1]
+      //   api.point(u, v, { color, r, alpha, hollow })
+      if (o.extras) {
+        o.extras({
+          curve(fn, st) {
+            const N = st.n || 160;
+            let prev = view(surfAt(fn(0)));
+            for (let k = 1; k <= N; k++) {
+              const cur = view(surfAt(fn(k / N)));
+              items.push({ kind: 1, depth: (prev[2] + cur[2]) / 2 + 0.1, p0: prev, p1: cur, alpha: st.alpha == null ? 1 : st.alpha, w: st.w || 3, color: st.color });
+              prev = cur;
+            }
+          },
+          point(u, v, st) {
+            const pt = view(surf(u, v, r * 1.05));
+            items.push({ kind: 2, depth: pt[2] + 0.12, p: pt, alpha: st.alpha == null ? 1 : st.alpha, color: st.color, r: st.r, hollow: st.hollow });
+          },
+        });
+      }
+
       // Traced loop: faint full path + glowing trail + point
-      const s = ((Math.max(0, ti - 2.0)) / o.loopSeconds) % 1;
-      if (dotIn > 0) {
+      const elapsed = Math.max(0, t - loopT0);
+      const s = (elapsed / o.loopSeconds) % 1;
+      if (o.onFrame) o.onFrame(s);
+      if (dotIn > 0 && o.drawLoop) {
         if (o.showPath) {
           const N = 360;
           let prev = view(loopPoint(0));
@@ -161,7 +207,7 @@
             prev = cur;
           }
         }
-        const trailLen = Math.min(o.trail, Math.max(0, ti - 2.0) / o.loopSeconds);
+        const trailLen = Math.min(o.trail, elapsed / o.loopSeconds);
         const N = 140;
         let prev = view(loopPoint(s - trailLen));
         for (let k = 1; k <= N; k++) {
@@ -205,17 +251,23 @@
         } else if (it.kind === 1) {
           const a = project(it.p0), b = project(it.p1);
           ctx.globalAlpha = it.alpha;
-          ctx.strokeStyle = HI;
+          ctx.strokeStyle = it.color || HI;
           ctx.lineWidth = it.w;
           ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
         } else {
           const a = project(it.p);
+          const col = it.color || HI;
           ctx.save();
           ctx.globalAlpha = it.alpha;
-          ctx.shadowColor = HI;
-          ctx.shadowBlur = 20;
-          ctx.fillStyle = HI;
-          ctx.beginPath(); ctx.arc(a[0], a[1], 8.5 * it.alpha, 0, TAU); ctx.fill();
+          if (it.hollow) {
+            ctx.fillStyle = "#0c0d0f"; ctx.strokeStyle = col; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.arc(a[0], a[1], it.r || 6, 0, TAU); ctx.fill(); ctx.stroke();
+          } else {
+            ctx.shadowColor = col;
+            ctx.shadowBlur = 20;
+            ctx.fillStyle = col;
+            ctx.beginPath(); ctx.arc(a[0], a[1], (it.r || 8.5) * (it.r ? 1 : it.alpha), 0, TAU); ctx.fill();
+          }
           ctx.restore();
         }
       }
@@ -259,6 +311,35 @@
     }
 
     return {
+      /* Draw one frame at time t (seconds), for pages that run their own animation loop. */
+      renderAt(t) { draw(t); },
+      /* Change the spin speed without the torus jumping to a new angle. */
+      setSpin(speed) {
+        spinOffset += lastT * (o.spinSpeed - speed);
+        o.spinSpeed = speed;
+      },
+      /* The visible surface point (u, v) nearest the canvas position (x, y), or null. */
+      pick(x, y, maxDist = 18) {
+        let best = null, bestZ = -Infinity;
+        for (let i = 0; i < 120; i++) {
+          for (let j = 0; j < 60; j++) {
+            const u = (i / 120) * TAU, v = (j / 60) * TAU;
+            const vp = view(surf(u, v, r));
+            const pp = project(vp);
+            if (Math.hypot(pp[0] - x, pp[1] - y) > maxDist) continue;
+            if (vp[2] > bestZ) { bestZ = vp[2]; best = [u, v]; }
+          }
+        }
+        return best;
+      },
+      /* Screen position (canvas px) of the surface point (u, v), as of the last frame drawn. */
+      toScreen(u, v) { return project(view(surf(u, v, r * 1.05))); },
+      /* Change the traced loop's winding numbers; the point restarts from the start. */
+      setLoop(p, q) {
+        o.p = p; o.q = q;
+        loopT0 = lastT;
+        if (!running) draw(lastT || o.startDelay + 6);
+      },
       resize() { resize(); if (!running) draw(o.startDelay + 6); },
       start() {
         resize();

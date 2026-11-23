@@ -62,7 +62,7 @@
               <p data-step-caption>A single issue: how much should be spent on the military?</p>
               <p data-step-caption>Add a second issue, research spending. Every possible budget is now a point in the plane.</p>
               <p data-step-caption>A third axis gives one voter&rsquo;s personal utility: how happy each budget would make them.</p>
-              <p data-step-caption>At any budget, the gradient points in the direction this voter would most like the budget to move. Its direction alone is a point on the circle S&sup1;.</p>
+              <p data-step-caption>At any budget, the gradient points in the direction this voter would most like the budget to move. Its direction is a point on the circle S&sup1;. This is how we choose to express social choices.</p>
             </div>
 
             <div class="s1-panel" id="rep-s1" hidden>
@@ -118,32 +118,23 @@
           </div>
 
           <div class="avg-demo" id="avg">
-            <div class="avg-demo__panels">
-              <div class="figure">
-                <canvas class="figure__canvas figure__canvas--square" id="avg-circle" aria-label="Two voters on a circle and their average"></canvas>
-                <p class="figure__hint is-active">Drag voter 1 or voter 2</p>
-              </div>
-              <div class="figure">
-                <canvas class="figure__canvas figure__canvas--square" id="avg-graph" aria-label="Graph of the average against the angle between the voters"></canvas>
-                <p class="figure__hint is-active">Drag along the graph to move voter 2</p>
-              </div>
+            <div class="figure">
+              <canvas class="figure__canvas avg-demo__circle" id="avg-circle" aria-label="Two voters on a circle and their average"></canvas>
+              <p class="figure__hint is-active">Drag voter 1 or voter 2</p>
             </div>
             <div class="avg-demo__bar">
-              <p class="avg-demo__status" id="avg-status" aria-live="polite"></p>
               <div class="avg-demo__buttons">
                 <button type="button" class="stepper__btn" id="avg-sweep">Sweep voter 2 around</button>
-                <button type="button" class="stepper__btn" id="avg-reset">Reset</button>
               </div>
             </div>
           </div>
 
           <div class="prose prose--after-demo">
-            <p>This, however, breaks continuity.</p>
+            <p>Unfortunately, as you can see, this breaks continuity.</p>
           </div>
 
           <div class="prose">
-            <h3>Any two are easy</h3>
-            <p>We can easily come up with systems that follow 2 of the properties, but what about all three?</p>
+            <h3>Attempts at systems:</h3>
           </div>
 
           <div class="rules" role="table" aria-label="Example rules and which properties they satisfy">
@@ -170,6 +161,148 @@
               <span role="cell" class="yes" aria-label="yes">&#10003;</span>
               <span role="cell" class="yes" aria-label="yes">&#10003;</span>
               <span role="cell" class="no" aria-label="no">&#10007;</span>
+            </div>
+          </div>
+
+          <div class="prose prose--after-table">
+            <p>We can easily come up with systems that follow 2 of the properties, but what about all three?</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 03 · WINDING NUMBERS ============ -->
+      <section class="page" id="winding" data-tab="Winding Numbers">
+        <div class="page__inner page__inner--wide">
+          <header class="page__head">
+            <span class="page__num"></span>
+            <h2>Winding Numbers</h2>
+          </header>
+
+          <div class="prose">
+            <p>A <em>loop</em> in \(S^1\) is a path around the circle that ends where it started. Its <em>winding number</em> counts how many times it goes around: each counterclockwise turn counts \(+1\), and each clockwise turn counts \(-1\).</p>
+          </div>
+
+          <div class="wind-demo" id="wind">
+            <div class="wind-demo__panels">
+              <div class="figure">
+                <canvas class="figure__canvas figure__canvas--square" id="wind-circle" aria-label="A point being dragged around the circle"></canvas>
+                <p class="figure__hint is-active">Drag the point around the circle</p>
+              </div>
+              <div class="figure">
+                <canvas class="figure__canvas figure__canvas--square" id="wind-helix" aria-label="The same path unwound onto a helix"></canvas>
+                <p class="figure__hint is-active">The same path, unwound</p>
+              </div>
+            </div>
+            <div class="wind-demo__bar">
+              <div class="wind-demo__readout">
+                <span class="wind-demo__label">Turns so far</span>
+                <span class="wind-demo__value" id="wind-turns">0.00</span>
+                <span class="wind-demo__note" id="wind-note"></span>
+              </div>
+              <div class="wind-demo__buttons">
+                <button type="button" class="stepper__btn" data-wind-preset="1">Wind once</button>
+                <button type="button" class="stepper__btn" id="wind-clear">Clear</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="prose prose--after-demo">
+            <p>Follow the angle of the point as it moves, without ever resetting it to \(0^\circ\) when it passes \(360^\circ\). Call this running angle \(\theta(t)\), where \(t\) goes from \(0\) at the start of the loop to \(1\) at the end, and \(\theta(0) = 0^\circ\). This is the helix on the right: going around the circle once lifts you one level up the helix.</p>
+            <p>On a closed loop, the point is back where it started, so \(\theta(1)\) and \(\theta(0)\) describe the same point on the circle. Two angles describe the same point exactly when they differ by a whole number of full turns, so
+            \[ \theta(1) - \theta(0) = 2\pi n \quad \text{for some } n \in \mathbb{Z}. \]
+            That integer \(n\) is the winding number. Because \(n\) is an integer, it can&rsquo;t change gradually. Deforming a loop continuously would have to change its winding number continuously, and the only way for a whole number to change continuously is not to change at all.</p>
+          </div>
+
+          <div class="prose">
+            <h3>Loops on the torus</h3>
+            <p>A point on \(S^1 \times S^1\) is a pair of angles \((\theta_1, \theta_2)\), which can be visualized as a torus. Moving \(\theta_1\) carries you around the long way, and moving \(\theta_2\) carries you around the tube.</p>
+            <p>A loop on the torus therefore has two winding numbers, \((m, n)\): \(m\) counts how many times \(\theta_1\) goes around its circle, and \(n\) counts how many times \(\theta_2\) does.</p>
+          </div>
+
+          <div class="torus-demo" id="tw">
+            <div class="figure">
+              <canvas class="figure__canvas" id="tw-canvas" aria-label="A loop on a torus with two winding numbers"></canvas>
+              <p class="figure__hint is-active">Right-click and drag to rotate</p>
+            </div>
+            <div class="torus-demo__side">
+              <div class="torus-demo__factor" data-factor="m">
+                <canvas class="torus-demo__circle" id="tw-x" aria-label="θ₁ around its circle"></canvas>
+                <div class="torus-demo__ctl">
+                  <span class="torus-demo__name torus-demo__name--x">\(\theta_1\) winds \(m\)</span>
+                  <div class="torus-demo__stepper">
+                    <button type="button" class="stepper__btn" data-tw="m" data-d="-1" aria-label="Decrease m">&minus;</button>
+                    <span class="torus-demo__num" id="tw-m">1</span>
+                    <button type="button" class="stepper__btn" data-tw="m" data-d="1" aria-label="Increase m">+</button>
+                  </div>
+                </div>
+              </div>
+              <div class="torus-demo__factor" data-factor="n">
+                <canvas class="torus-demo__circle" id="tw-y" aria-label="θ₂ around its circle"></canvas>
+                <div class="torus-demo__ctl">
+                  <span class="torus-demo__name torus-demo__name--y">\(\theta_2\) winds \(n\)</span>
+                  <div class="torus-demo__stepper">
+                    <button type="button" class="stepper__btn" data-tw="n" data-d="-1" aria-label="Decrease n">&minus;</button>
+                    <span class="torus-demo__num" id="tw-n">2</span>
+                    <button type="button" class="stepper__btn" data-tw="n" data-d="1" aria-label="Increase n">+</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 04 · PROOF BY CONTRADICTION ============ -->
+      <section class="page" id="proof" data-tab="Proof by Contradiction!">
+        <div class="page__inner page__inner--wide">
+          <header class="page__head">
+            <span class="page__num"></span>
+            <h2>Proof by Contradiction!</h2>
+          </header>
+
+          <div class="stepper" id="pf">
+            <div class="stepper__tabs" role="tablist" aria-label="Steps">
+              <button type="button" role="tab" data-step-tab><span>1</span>The picture</button>
+              <button type="button" role="tab" data-step-tab><span>2</span>Three loops</button>
+              <button type="button" role="tab" data-step-tab><span>3</span>Through &phi;</button>
+              <button type="button" role="tab" data-step-tab><span>4</span>Anonymity</button>
+              <button type="button" role="tab" data-step-tab><span>5</span>Unanimity</button>
+              <button type="button" role="tab" data-step-tab><span>6</span>Continuity</button>
+              <button type="button" role="tab" data-step-tab><span>7</span>Contradiction</button>
+            </div>
+
+            <div class="figure proof-fig" id="pf-fig">
+              <div class="proof-fig__panels">
+                <div class="proof-panel proof-panel--torus"><canvas id="pf-torus" aria-label="The torus of vote pairs"></canvas></div>
+                <div class="proof-panel proof-panel--square"><canvas id="pf-square" aria-label="The torus cut open into a square"></canvas></div>
+                <div class="proof-panel proof-panel--out">
+                  <canvas id="pf-out" aria-label="The output circle"></canvas>
+                  <div class="proof-ledger" id="pf-ledger" aria-live="polite"></div>
+                </div>
+              </div>
+              <canvas class="proof-fig__overlay" id="pf-overlay" aria-hidden="true"></canvas>
+              <div class="proof-note" data-note="torus">Each pair of votes \((\theta_1, \theta_2)\) is a point on the torus</div>
+              <div class="proof-note" data-note="point">The current pair of votes, shown in both pictures. Drag it around!</div>
+              <div class="proof-note" data-note="phi">\(\varphi\): the voting rule we&rsquo;re assuming exists</div>
+              <div class="proof-note" data-note="square">The torus cut open and laid flat. Matching arrows mark edges that are glued together</div>
+              <div class="proof-note" data-note="axes">Across: voter 1&rsquo;s vote \(\theta_1\). Up: voter 2&rsquo;s vote \(\theta_2\)</div>
+              <div class="proof-note" data-note="out">The group&rsquo;s choice \(\varphi(\theta_1, \theta_2)\), a point on \(S^1\)</div>
+            </div>
+
+            <div class="stepper__captions">
+              <p data-step-caption>Suppose there is a rule \(\varphi\) that is unanimous, anonymous and continuous. Here is the picture we&rsquo;ll use to show that it can&rsquo;t exist.</p>
+              <p data-step-caption>Three loops of votes. Along \(\alpha\), voter 1&rsquo;s vote goes around once while voter 2&rsquo;s stays put. Along \(\beta\), voter 2&rsquo;s goes around while voter 1&rsquo;s stays put. Along \(\delta\), both go around together, always agreeing.</p>
+              <p data-step-caption>Since \(\varphi\) is continuous, it turns each loop of votes into a loop on the output circle, and each of those has a winding number. Call them \(m\) for \(\alpha\) and \(n\) for \(\beta\).</p>
+              <p data-step-caption>Anonymity says \(\varphi(\theta, 0) = \varphi(0, \theta)\). Swapping the two voters turns \(\alpha\) into \(\beta\) without changing the outcome, so the two output loops are identical, and \(m = n\).</p>
+              <p data-step-caption>Unanimity says \(\varphi(\theta, \theta) = \theta\). Along \(\delta\) the voters always agree, so the output just goes around the circle once: \(\varphi(\delta)\) has winding number \(1\).</p>
+              <p data-step-caption>On the square, \(\delta\) slides smoothly into \(\alpha\) followed by \(\beta\) (the right edge is glued to the left edge, so it is <span class="nowrap">\(\beta\)).</span> Because \(\varphi\) is continuous, the output loop slides smoothly too, so its winding number can&rsquo;t change. Going around \(m\) times and then \(n\) times gives \(m + n\), so \(m + n = 1\).</p>
+              <p data-step-caption>Together, \(m = n\) and \(m + n = 1\) give \(2m = 1\), so \(m = \tfrac{1}{2}\). But \(m\) is a winding number, and winding numbers are integers. No rule can be unanimous, anonymous and continuous.</p>
+            </div>
+
+            <div class="stepper__controls">
+              <button type="button" class="stepper__btn" data-step-dir="-1">&larr; Back</button>
+              <span class="stepper__count" aria-live="polite"></span>
+              <button type="button" class="stepper__btn" data-step-dir="1">Next &rarr;</button>
             </div>
           </div>
         </div>
@@ -199,6 +332,8 @@
   <script src="js/stepper.js"></script>
   <script src="js/represent-vote.js"></script>
   <script src="js/averaging.js"></script>
+  <script src="js/winding.js"></script>
+  <script src="js/proof.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

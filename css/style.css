@@ -262,6 +262,7 @@ kbd {
 .prose em { color: var(--accent); font-style: italic; }
 .axioms + .prose { margin-top: 32px; }
 .prose--after-demo { margin-top: 24px; }
+.prose--after-table { margin-top: 24px; }
 .katex { font-size: 1.05em; }
 
 .axioms {
@@ -319,15 +320,112 @@ kbd {
   gap: 16px;
 }
 .figure__canvas--square { aspect-ratio: 1; cursor: pointer; }
+.avg-demo__circle { aspect-ratio: 2 / 1; cursor: pointer; }
 .avg-demo__bar {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 24px;
+  justify-content: flex-end;
   margin-top: 18px;
 }
-.avg-demo__status { margin: 0; max-width: 40em; min-height: 3.2em; font-size: 1.05rem; }
 .avg-demo__buttons { display: flex; gap: 10px; flex: none; }
+
+/* =========================================================================
+   WINDING NUMBERS
+   ========================================================================= */
+.wind-demo__panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+#wind-helix { cursor: default; }
+.wind-demo__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+.wind-demo__readout { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.wind-demo__label { font-size: .85rem; color: var(--text-muted); letter-spacing: .04em; }
+.wind-demo__value {
+  font-size: 1.9rem;
+  color: var(--highlight);
+  font-variant-numeric: tabular-nums;
+  min-width: 3.6em;
+}
+.wind-demo__note { font-size: 1rem; color: var(--text-muted); }
+.wind-demo__note.is-closed { color: var(--highlight); }
+.wind-demo__buttons { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.torus-demo {
+  display: grid;
+  grid-template-columns: 1fr 250px;
+  gap: 16px;
+  margin-top: 8px;
+}
+.torus-demo__side { display: grid; gap: 16px; align-content: start; }
+.torus-demo__factor {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #0c0d0f;
+  padding: 12px 14px 14px;
+}
+.torus-demo__circle { display: block; width: 100%; aspect-ratio: 1.25; }
+.torus-demo__ctl { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.torus-demo__name { font-size: 1rem; white-space: nowrap; }
+.torus-demo__name--x { color: var(--teal); }
+.torus-demo__name--y { color: var(--red); }
+.torus-demo__stepper { display: flex; align-items: center; gap: 8px; }
+.torus-demo__stepper .stepper__btn { width: 34px; height: 34px; padding: 0; font-size: 1.1rem; line-height: 1; }
+.torus-demo__num { min-width: 1.6em; text-align: center; font-size: 1.25rem; font-variant-numeric: tabular-nums; }
+
+/* =========================================================================
+   IMPOSSIBILITY PROOF
+   ========================================================================= */
+.proof-fig { padding: 0; }
+.nowrap { white-space: nowrap; }
+.proof-fig__panels {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr 1fr;
+  grid-template-areas: "torus square out";
+}
+.proof-panel { position: relative; }
+.proof-panel canvas { display: block; width: 100%; touch-action: none; }
+.proof-panel canvas.is-draggable { cursor: grab; }
+.proof-panel canvas.is-draggable:active { cursor: grabbing; }
+.proof-panel--torus { grid-area: torus; }
+.proof-panel--torus canvas { aspect-ratio: 1.3; }
+.proof-panel--square { grid-area: square; }
+.proof-panel--square canvas, .proof-panel--out canvas { aspect-ratio: 1; }
+.proof-panel--out { grid-area: out; }
+.proof-fig__overlay {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+}
+.proof-ledger {
+  position: absolute;
+  left: 8px; right: 8px; bottom: 12px;
+  display: grid; gap: 2px;
+  justify-items: center;
+  font-size: .95rem;
+  min-height: 1.5em;
+}
+.proof-ledger > div { opacity: 0; animation: ledger-in .5s var(--ease) forwards; }
+.proof-ledger .is-bad { color: var(--red); }
+@keyframes ledger-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+.proof-note {
+  position: absolute;
+  max-width: 210px;
+  font-size: .85rem;
+  line-height: 1.35;
+  color: var(--text);
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .4s;
+}
+.proof-fig.show-notes .proof-note { opacity: 1; }
 
 /* The S¹ read-out under the figure */
 .s1-panel {
@@ -570,13 +668,18 @@ kbd {
   .page__inner { padding: 88px 16px 64px; }
   .figure__canvas { aspect-ratio: 1; }
   .figure__hint { display: none; }
-  .axioms, .avg-demo__panels { grid-template-columns: 1fr; }
+  .axioms, .avg-demo__panels, .wind-demo__panels, .torus-demo { grid-template-columns: 1fr; }
+  .torus-demo__side { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .torus-demo__factor { padding: 10px; }
+  .torus-demo__ctl { flex-direction: column; }
+  .proof-fig__panels { grid-template-columns: 1fr 1fr; grid-template-areas: "torus torus" "square out"; }
+  .proof-ledger { font-size: .75rem; bottom: 6px; }
+  .proof-note { max-width: 46%; font-size: .78rem; }
   .rules__row { grid-template-columns: 1fr repeat(3, 44px); }
   .rules__row > span { padding: 12px 10px; }
   .rules__row--head > span { font-size: .8rem !important; }
   .rules .long { display: none; }
   .rules .short { display: inline; }
-  .avg-demo__bar { flex-direction: column; }
   .s1-panel { grid-template-columns: 1fr; justify-items: center; text-align: center; padding: 16px; }
   .s1-panel__canvas { max-width: 240px; }
   .title-block { padding-top: 13vh; }
